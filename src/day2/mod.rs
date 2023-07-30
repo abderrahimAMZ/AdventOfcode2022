@@ -3,17 +3,17 @@ pub fn score(round:&str) -> i32{
     let mut result:i32;
     let players = round.as_bytes();
     println!("{:?}",players);
-    if (players.is_empty()){
+    if players.is_empty() {
         result = 0;
     }
     else {
         let player1 = convertChoiceToNumber(*players.get(0).unwrap() as char);
         let player2 = convertChoiceToNumber(*players.get(2).unwrap() as char);
         result = player2;
-        if (player2 == player1+1 || player2 == player1.clone() -2){
+        if player2 == player1+1 || player2 == player1.clone() -2 {
             result += 6;
         }
-        else if (player2 == player1){
+        else if player2 == player1 {
             result += 3
         }
     }
@@ -34,11 +34,11 @@ pub fn score_2(round:&str) -> i32{
     if !players.is_empty() {
         let player1 = convertChoiceToNumber(*players.get(0).unwrap() as char);
         let player2 = convertChoiceToNumber(*players.get(2).unwrap() as char);
-        if (player2 == 3){
+        if player2 == 3 {
             result += 6;
             result += if player1 ==3 {1} else {player1+1}
         }
-        else if (player2 == 2){
+        else if player2 == 2 {
             result += 3;
             result += player1;
         }
