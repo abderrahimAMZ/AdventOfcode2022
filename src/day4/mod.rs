@@ -1,49 +1,52 @@
-use std::convert::TryInto;
+use crate::day4::ParseAssignmentError::{MissingDash, MissingFirst, MissingLast};
 use std::num::ParseIntError;
 use std::str::FromStr;
+
 #[derive(Debug)]
-pub struct assignment {
-    first : i16,
-    last : i16
+pub struct Assignment {
+    first: i16,
+    last: i16,
 }
-impl FromStr for assignment {
-    type Err = i16;
+#[derive(Debug)]
+pub enum ParseAssignmentError {
+    MissingDash,
+    MissingFirst(ParseIntError),
+    MissingLast(ParseIntError),
+}
+impl FromStr for Assignment {
+    type Err = ParseAssignmentError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (a,b) = s.split_at(s.find('-').unwrap()) else {
-            return Err(-20)
-        };
-        let (b,c) = b.split_at(1) else {
-            return Err(-20)
-        };
-        Ok( Self {
-            first : a.parse::<i16>().unwrap(),
-            last : c.parse::<i16>().unwrap()
+        let (a, b) = s.split_once('-').ok_or(MissingDash)?;
+
+        Ok(Self {
+            first: a
+                .parse::<i16>()
+                .map_err(ParseAssignmentError::MissingFirst)?,
+            last: b
+                .parse::<i16>()
+                .map_err(ParseAssignmentError::MissingLast)?,
         })
     }
 }
-impl assignment {
-    pub fn contains(&self, ass : &assignment)-> bool {
-        self.first <= ass.first  &&  self.last >= ass.last
+impl Assignment {
+    pub fn contains(&self, ass: &Assignment) -> bool {
+        self.first <= ass.first && self.last >= ass.last
+    }
+    pub fn overlaps(&self, ass: &Assignment) -> bool {
+        (self.last >= ass.first && self.first <= ass.first)
+            || (self.first <= ass.last && self.last >= ass.last)
     }
 }
-pub fn camp_cleanup(input :&str)-> usize {
+pub fn camp_cleanup(input: &str) -> usize {
     input
         .lines()
-        .map(|line| {
-            let index = line.find(',').unwrap();
-            let (a,b) = line.split_at(index);
-            let (b,c) = b.split_at(1);
-            (a,c) } )
-        .map(|(a,b)| {
-            let ass1 = a.parse::<assignment>();
-            let ass2 = b.parse::<assignment>();
-            (ass1.unwrap(),ass2.unwrap())
+        .map(|line| line.split_once(',').unwrap())
+        .map(|(a, b)| {
+            let ass1 = a.parse::<Assignment>().unwrap();
+            let ass2 = b.parse::<Assignment>().unwrap();
+            (ass1, ass2)
         })
-        .filter(|(ass1,ass2)| {
-            let is_contained = ass1.contains(ass2) || ass2.contains(ass1);
-            is_contained
-        })
-        .collect::<Vec<_>>()
-        .len()
+        .filter(|(ass1, ass2)| ass1.overlaps(ass2) || ass2.overlaps(ass1))
+        .count()
 }
