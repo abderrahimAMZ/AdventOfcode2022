@@ -56,11 +56,13 @@ pub fn manage_crates(input: &str) {
             let source = &mut crates[Command.source];
             let source_len = source.len();
             let spliting_at = source_len - Command.how_many;
-            let  need_to_be_moved = source.split_off(spliting_at);
+            let need_to_be_moved = source.split_off(spliting_at);
             let destination = &mut crates[Command.destination];
-            destination.extend( need_to_be_moved);
+            destination.extend(need_to_be_moved);
         });
 
-    crates.iter_mut().for_each(|a_crate| print!("{}",a_crate.pop().unwrap()));
+    crates
+        .iter_mut()
+        .for_each(|a_crate| print!("{}", a_crate.pop().unwrap()));
     println!();
 }
