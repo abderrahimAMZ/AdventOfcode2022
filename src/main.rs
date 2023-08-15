@@ -11,12 +11,13 @@ mod day7;
 use day4::camp_cleanup;
 use day5::manage_crates;
 use day6::get_marker;
-use day7::create_tree;
+use day7::create_tree_day7;
 fn main() {
     let mut input_file = fs::read_to_string("src/day7/input.txt").expect("expect a file here");
     let now = Instant::now();
-    create_tree(&mut input_file);
+    let result = create_tree_day7(&mut input_file);
     let now2 = Instant::now();
     let time = now2 - now;
     println!("{:?}", time);
+    println!("{:?}", result);
 }
