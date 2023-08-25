@@ -1,9 +1,9 @@
 use crate::day7::Command::{
     ChangeDirectory, DirectoryContentDirectory, DirectoryContentFile, ListDirectory,
 };
+use std::cmp::max;
 use std::str::Lines;
 use std::{cell::RefCell, rc::Rc};
-use std::cmp::max;
 
 //TODO:: create data structure for every type of data
 #[derive(Debug)]
@@ -90,9 +90,9 @@ pub fn create_tree_day7(input: &str) -> i32 {
     let commands = create_command(input);
     let tree_head = construct_tree(commands);
 
-    let mut sizes:Vec<i32> = vec![];
-    let head_size = calculate_sizes(tree_head,&mut sizes);
-    let result = filter_sizes(sizes,head_size);
+    let mut sizes: Vec<i32> = vec![];
+    let head_size = calculate_sizes(tree_head, &mut sizes);
+    let result = filter_sizes(sizes, head_size);
     result
 }
 
@@ -126,40 +126,30 @@ fn construct_tree(commands: Vec<Command>) -> Rc<RefCell<Directory>> {
     head
 }
 //TODO:: walk through the tree to calculate folder
-fn calculate_sizes(head: DirectoryRef,sizes: &mut Vec<i32>) -> i32 {
+fn calculate_sizes(head: DirectoryRef, sizes: &mut Vec<i32>) -> i32 {
     let size = head.borrow().files_size()
         + head
-        .borrow()
-        .next
-        .iter()
-        .map(|dir| calculate_sizes(dir.as_ref().unwrap().clone(),sizes))
-        .sum::<i32>();
+            .borrow()
+            .next
+            .iter()
+            .map(|dir| calculate_sizes(dir.as_ref().unwrap().clone(), sizes))
+            .sum::<i32>();
     sizes.push(size.clone());
     size
 }
 //TODO:: filter sizes that are less then 10000 and return the result
-fn filter_sizes(mut sizes : Vec<i32>,head_size : i32)->i32 {
-
+fn filter_sizes(mut sizes: Vec<i32>, head_size: i32) -> i32 {
     let total_system_size = 70_000_000;
     let total_free_space = 30_000_000;
 
-    println!("head size {}",head_size);
+    println!("head size {}", head_size);
     let desired_free_space = total_free_space - (total_system_size - head_size);
-    println!(" desired free space is {}",desired_free_space);
-    let result = sizes.iter()
+    println!(" desired free space is {}", desired_free_space);
+    let result = sizes
+        .iter()
         .filter(|&&size| size >= desired_free_space)
         .map(|&size| size)
         .min()
         .unwrap();
-    /*
-    let mut less_than_free_space:Vec<i32> = sizes.into_iter().filter(|size| *size <= desired_free_space).collect();
-    less_than_free_space.sort_by(|a,b| a.cmp(b));
-    let mut less_than_free_space= less_than_free_space.iter();
-    let mut result = 0;
-    while result < desired_free_space {
-        result = result + less_than_free_space.next().unwrap();
-    }
-
-     */
-   result
+    result
 }
